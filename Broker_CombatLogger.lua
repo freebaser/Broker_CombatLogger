@@ -1,7 +1,7 @@
 local ADDON_NAME, ns = ...
 
-local autolog = true -- Automatically enable logging for zones below
-local autologDisable = true -- Always disable logging if not in an autolog zone
+local autolog = false -- Automatically enable logging for zones below
+local autoDisable = true -- Always disable logging if not in an autolog zone
 local Z = {
     [752] = true, -- Baradin Hold
     [754] = true, -- Blackwing Descent
@@ -78,12 +78,12 @@ local zoneDelay = function(self, elapsed)
         SetMapToCurrentZone()
         local zone = GetCurrentMapAreaID()
 
-        print(GetInstanceInfo().." "..zone.."Logger")
+        --print(GetInstanceInfo().." "..zone.." Logger")
 
         if Z[zone] and not LoggingCombat() then
             ns:Enable()
         end
-    elseif autologDisable and LoggingCombat() then
+    elseif autoDisable and LoggingCombat() then
         ns:Disable()
     end
 
