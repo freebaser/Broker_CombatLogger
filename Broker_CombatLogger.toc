@@ -1,8 +1,8 @@
-## Interface: 40200
+## Interface: 40300
 ## Title: Broker_CombatLogger
 ## Notes: Toggle combat logging with LDB.
 ## Author: Freebaser
-## Version: 1.2
+## Version: @project-version@
 
 LibStub.lua
 CallbackHandler-1.0.lua
