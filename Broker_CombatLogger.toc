@@ -2,7 +2,7 @@
 ## Title: Broker_CombatLogger
 ## Notes: Toggle combat logging with LDB.
 ## Author: Freebaser
-## Version: @project-version@
+## Version: 1.2
 
 LibStub.lua
 CallbackHandler-1.0.lua

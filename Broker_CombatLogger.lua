@@ -8,6 +8,7 @@ local Z = {
     [758] = true, -- The Bastion of Twilight
     [773] = true, -- Throne of the Four Winds
     [800] = true, -- Firelands
+    [824] = true, -- Dragon Soul
     -- [MapAreaID] = true,
 }
 
