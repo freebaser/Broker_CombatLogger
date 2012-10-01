@@ -3,12 +3,16 @@ local ADDON_NAME, ns = ...
 local autolog = true -- Automatically enable logging for zones below
 local autoDisable = true -- Always disable logging if not in an autolog zone
 local Z = {
-    [752] = true, -- Baradin Hold
-    [754] = true, -- Blackwing Descent
-    [758] = true, -- The Bastion of Twilight
-    [773] = true, -- Throne of the Four Winds
-    [800] = true, -- Firelands
-    [824] = true, -- Dragon Soul
+    --[752] = true, -- Baradin Hold
+    --[754] = true, -- Blackwing Descent
+    --[758] = true, -- The Bastion of Twilight
+    --[773] = true, -- Throne of the Four Winds
+    --[800] = true, -- Firelands
+    --[824] = true, -- Dragon Soul
+	 [897] = true, -- Heart of Fear
+	 [896] = true, -- Mogu'shan Vaults
+	 [886] = true, -- Terrace of Endless Spring
+
     -- [MapAreaID] = true,
 }
 

@@ -1,4 +1,4 @@
-## Interface: 40300
+## Interface: 50001
 ## Title: Broker_CombatLogger
 ## Notes: Toggle combat logging with LDB.
 ## Author: Freebaser
