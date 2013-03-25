@@ -12,6 +12,7 @@ local Z = {
 	 [897] = true, -- Heart of Fear
 	 [896] = true, -- Mogu'shan Vaults
 	 [886] = true, -- Terrace of Endless Spring
+	 [930] = true, -- Throne of Thunder
 
     -- [MapAreaID] = true,
 }
