@@ -13,31 +13,38 @@ local Z = {
 	 [896] = true, -- Mogu'shan Vaults
 	 [886] = true, -- Terrace of Endless Spring
 	 [930] = true, -- Throne of Thunder
+	 [953] = true, -- Siege of Orgrimmar
 
     -- [MapAreaID] = true,
 }
 
-local L = ns.Locale
+local ENABLE = ENABLE
+local DISABLE = DISABLE
+local L = setmetatable({}, { __index = function(t, k)
+	local v = tostring(k)
+	rawset(t, k, v)
+	return v
+end })
 
 local enableIcon = "Interface\\CURSOR\\Attack"
 local disableIcon = "Interface\\CURSOR\\UnableAttack"
 
 local frame = CreateFrame('Frame', nil, ChatFrame1EditBox)
-frame:SetScript('OnHide', function(self)
+frame:HookScript("OnHide", function(self)
     if LoggingCombat() then
         ns.broker.icon = enableIcon
-        ns.broker.text = "|cff00FF00"..L["Enabled"].."|r"
+        ns.broker.text = "|cff00FF00"..ENABLE.."|r"
     else
         ns.broker.icon = disableIcon
-        ns.broker.text = L["Disabled"]
+        ns.broker.text = DISABLE
     end
 end)
 
 ns.broker = LibStub("LibDataBroker-1.1"):NewDataObject(ADDON_NAME, {
-    label = "CombatLogger",
+    label = ADDON_NAME,
     type = "data source",
     icon = disableIcon,
-    text = L["Disabled"],
+    text = DISABLE,
     OnClick = function(self, button)
         if button == "LeftButton" then
             if LoggingCombat() then
@@ -49,7 +56,7 @@ ns.broker = LibStub("LibDataBroker-1.1"):NewDataObject(ADDON_NAME, {
     end,
     OnTooltipShow = function(tip)
         if tip and tip.AddLine then
-            tip:AddLine("|cffFFFF00CombatLogger|r")
+            tip:AddLine("|cffFFFF00"..ADDON_NAME.."|r")
             tip:AddLine(("|cffFF00FF%s|r |cffFFFFFF%s|r"):format(L["Left-click"], L["to toggle combat logging."]))
         end
     end,
@@ -58,25 +65,20 @@ ns.broker = LibStub("LibDataBroker-1.1"):NewDataObject(ADDON_NAME, {
 function ns:Enable()
     LoggingCombat(true)
     ns.broker.icon = enableIcon
-    ns.broker.text = "|cff00FF00"..L["Enabled"].."|r"
+    ns.broker.text = "|cff00FF00"..ENABLE.."|r"
     print(COMBATLOGENABLED)
 end
 
 function ns:Disable()
     LoggingCombat(false)
     ns.broker.icon = disableIcon
-    ns.broker.text = L["Disabled"]
+    ns.broker.text = DISABLE
     print(COMBATLOGDISABLED)
 end
 
-local f = CreateFrame("frame")
-f:SetScript("OnEvent", function(self, event, ...) if ns[event] then return ns[event](ns, event, ...) end end)
-function ns:RegisterEvent(...) for i=1,select("#", ...) do f:RegisterEvent((select(i, ...))) end end
-function ns:UnregisterEvent(...) for i=1,select("#", ...) do f:UnregisterEvent((select(i, ...))) end end
-
-local zoneFrame = CreateFrame"Frame"
 local delaytimer = 0
-local zoneDelay = function(self, elapsed)
+local zoneDelay = CreateFrame"Frame"
+zoneDelay:SetScript("OnUpdate", function(self, elapsed)
     delaytimer = delaytimer + elapsed
 
     if delaytimer < 5 then return end
@@ -92,21 +94,22 @@ local zoneDelay = function(self, elapsed)
         ns:Disable()
     end
 
-    self:SetScript("OnUpdate", nil)
+    self:Hide()
     delaytimer = 0
-end
+end)
 
-ns:RegisterEvent"PLAYER_ENTERING_WORLD"
-ns:RegisterEvent"ZONE_CHANGED_NEW_AREA"
-function ns:PLAYER_ENTERING_WORLD()
+local zoneChanged = CreateFrame"Frame" 
+zoneChanged:RegisterEvent"PLAYER_ENTERING_WORLD"
+zoneChanged:RegisterEvent"ZONE_CHANGED_NEW_AREA"
+zoneChanged:SetScript("OnEvent", function(self, ...)
     if LoggingCombat() then
         ns:Enable()
     end
 
-    self:UnregisterEvent"PLAYER_ENTERING_WORLD"
     if autolog then
-        zoneFrame:SetScript("OnUpdate", zoneDelay)
+        zoneDelay:Show()
     end
-end
-ns.ZONE_CHANGED_NEW_AREA = ns.PLAYER_ENTERING_WORLD
+
+	self:UnregisterEvent"PLAYER_ENTERING_WORLD"
+end)
 
