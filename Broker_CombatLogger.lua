@@ -31,7 +31,7 @@ local disableIcon = "Interface\\CURSOR\\UnableAttack"
 
 local frame = CreateFrame('Frame', nil, ChatFrame1EditBox)
 frame:HookScript("OnHide", function(self)
-    if LoggingCombat() then
+    if(LoggingCombat()) then
         ns.broker.icon = enableIcon
         ns.broker.text = "|cff00FF00"..ENABLE.."|r"
     else
@@ -46,8 +46,8 @@ ns.broker = LibStub("LibDataBroker-1.1"):NewDataObject(ADDON_NAME, {
     icon = disableIcon,
     text = DISABLE,
     OnClick = function(self, button)
-        if button == "LeftButton" then
-            if LoggingCombat() then
+        if(button == "LeftButton") then
+            if(LoggingCombat()) then
                 ns:Disable()
             else
                 ns:Enable()
@@ -55,7 +55,7 @@ ns.broker = LibStub("LibDataBroker-1.1"):NewDataObject(ADDON_NAME, {
         end
     end,
     OnTooltipShow = function(tip)
-        if tip and tip.AddLine then
+        if(tip and tip.AddLine) then
             tip:AddLine("|cffFFFF00"..ADDON_NAME.."|r")
             tip:AddLine(("|cffFF00FF%s|r |cffFFFFFF%s|r"):format(L["Left-click"], L["to toggle combat logging."]))
         end
@@ -63,53 +63,54 @@ ns.broker = LibStub("LibDataBroker-1.1"):NewDataObject(ADDON_NAME, {
 })
 
 function ns:Enable()
+	if(not LoggingCombat()) then
+		print(COMBATLOGENABLED)
+	end
     LoggingCombat(true)
     ns.broker.icon = enableIcon
     ns.broker.text = "|cff00FF00"..ENABLE.."|r"
-    print(COMBATLOGENABLED)
 end
 
 function ns:Disable()
+	if(LoggingCombat()) then
+		print(COMBATLOGDISABLED)
+	end
     LoggingCombat(false)
     ns.broker.icon = disableIcon
     ns.broker.text = DISABLE
-    print(COMBATLOGDISABLED)
 end
 
-local delaytimer = 0
 local zoneDelay = CreateFrame"Frame"
 zoneDelay:SetScript("OnUpdate", function(self, elapsed)
-    delaytimer = delaytimer + elapsed
+    self.elapsed = (self.elapsed or 0) + elapsed
+    if(self.elapsed < 5) then return end
 
-    if delaytimer < 5 then return end
+	if(IsInInstance()) then
+		SetMapToCurrentZone()
+	end
 
-    if IsInInstance() then
-        SetMapToCurrentZone()
-        local zone = GetCurrentMapAreaID()
-
-        if Z[zone] and not LoggingCombat() then
-            ns:Enable()
-        end
-    elseif autoDisable and LoggingCombat() then
+	local zone = GetCurrentMapAreaID()
+    if(Z[zone]) then
+        ns:Enable()
+    elseif(autoDisable) then
         ns:Disable()
     end
 
     self:Hide()
-    delaytimer = 0
+    self.elapsed = 0
 end)
 
 local zoneChanged = CreateFrame"Frame" 
 zoneChanged:RegisterEvent"PLAYER_ENTERING_WORLD"
-zoneChanged:RegisterEvent"ZONE_CHANGED_NEW_AREA"
-zoneChanged:SetScript("OnEvent", function(self, ...)
-    if LoggingCombat() then
-        ns:Enable()
-    end
+zoneChanged:SetScript("OnEvent", function(self, event, ...)
 
-    if autolog then
+	if(event == "PLAYER_ENTERING_WORLD") then
+		self:UnregisterEvent"PLAYER_ENTERING_WORLD"
+		self:RegisterEvent"ZONE_CHANGED_NEW_AREA"
+	end
+
+    if(autolog) then
         zoneDelay:Show()
     end
-
-	self:UnregisterEvent"PLAYER_ENTERING_WORLD"
 end)
 
